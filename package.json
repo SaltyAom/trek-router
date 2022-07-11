@@ -1,7 +1,7 @@
 {
     "name": "@saltyaom/trek-router",
     "description": "Smol HTTP router library",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "author": {
         "name": "saltyAom",
         "url": "https://github.com/SaltyAom",
@@ -33,7 +33,8 @@
         "build": "npm run build:main && npm run build:cjs && npm run build:es",
         "build:cjs": "swc src --config-file .cjs.swcrc -d build/cjs",
         "build:es": "swc src --config-file .es.swcrc -d build/es",
-        "build:main": "swc src --config-file .cjs.swcrc -d build"
+        "build:main": "swc src --config-file .cjs.swcrc -d build",
+        "release": "npm run build && npm publish --access public"
     },
     "devDependencies": {
         "@swc/cli": "^0.1.57",
@@ -43,22 +44,5 @@
         "@types/node": "^18.0.3",
         "nodemon": "^2.0.19",
         "typescript": "^4.7.4"
-    },
-    "engines": {
-        "node": ">= 14"
-    },
-    "files": [
-        "HISTORY.md",
-        "LICENSE",
-        "index.js"
-    ],
-    "babel": {
-        "plugins": [
-            "transform-es2015-modules-commonjs",
-            "transform-export-extensions"
-        ],
-        "presets": [
-            "es2016"
-        ]
     }
 }
