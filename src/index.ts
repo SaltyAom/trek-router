@@ -17,20 +17,56 @@ type Result<T = any> = [
     query: ParsedUrlQuery
 ]
 
+export type HTTPMethod =
+    | 'ACL'
+    | 'BIND'
+    | 'CHECKOUT'
+    | 'CONNECT'
+    | 'COPY'
+    | 'DELETE'
+    | 'GET'
+    | 'HEAD'
+    | 'LINK'
+    | 'LOCK'
+    | 'M-SEARCH'
+    | 'MERGE'
+    | 'MKACTIVITY'
+    | 'MKCALENDAR'
+    | 'MKCOL'
+    | 'MOVE'
+    | 'NOTIFY'
+    | 'OPTIONS'
+    | 'PATCH'
+    | 'POST'
+    | 'PROPFIND'
+    | 'PROPPATCH'
+    | 'PURGE'
+    | 'PUT'
+    | 'REBIND'
+    | 'REPORT'
+    | 'SEARCH'
+    | 'SOURCE'
+    | 'SUBSCRIBE'
+    | 'TRACE'
+    | 'UNBIND'
+    | 'UNLINK'
+    | 'UNLOCK'
+    | 'UNSUBSCRIBE'
+
 export const removeHostnamePath = (path: string) => {
-	if (path.charCodeAt(0) === 47) return path
+    if (path.charCodeAt(0) === 47) return path
 
-	const total = path.length
+    const total = path.length
 
-	let i = 1
-	let point = 0
+    let i = 1
+    let point = 0
 
-	for (; i < total; i++)
-		if (path.charCodeAt(i) === 47)
-			if (point < 2) point++
-			else break
+    for (; i < total; i++)
+        if (path.charCodeAt(i) === 47)
+            if (point < 2) point++
+            else break
 
-	return path.slice(i)
+    return path.slice(i)
 }
 
 const splitQuery = (s: string) => {
@@ -107,7 +143,7 @@ class TrekNode<T = any> {
     }
 }
 
-class Router<T = any> {
+export default class Router<T = any> {
     #tree: TrekNode<T>
     routes: any[]
 
@@ -171,8 +207,8 @@ class Router<T = any> {
         pnames?: any,
         handler?: any
     ) {
-        // Current TrekNode as root
-        let cn = this.#tree
+        // Copy current TrekNode as root
+        let [cn] = [this.#tree]
         let prefix, sl, pl, l, max, n, c
 
         while (true) {
@@ -243,19 +279,28 @@ class Router<T = any> {
         }
     }
 
-    find(
-        method: string,
+    find(method: HTTPMethod, url: string): Result<T> {
+        const [path, query] = splitQuery(removeHostnamePath(url))
+
+        let result = this.#find(method, path, undefined, 0, [
+            undefined,
+            []
+        ] as any)
+
+        if (query)
+            // @ts-ignore
+            result[2] = parseQueryString(query)
+
+        return result
+    }
+
+    #find(
+        method: HTTPMethod,
         path: string,
-        cn?: TrekNode,
-        n = 0,
-        result: Result<T> = [undefined, [], {}]
+        cn: TrekNode | undefined,
+        n: number,
+        result: Result<T>
     ) {
-        // let [path, query] = splitQuery(removeHostnamePath(url))
-
-        // if (query)
-        //     // @ts-ignore
-        //     result[2] = parseQueryString(query)
-
         cn = cn || this.#tree // Current TrekNode as root
         const sl = path.length
         const prefix = cn.prefix
@@ -292,7 +337,7 @@ class Router<T = any> {
         // Static TrekNode
         c = cn.findChild(path.charCodeAt(0), SKIND)
         if (c !== undefined) {
-            this.find(method, path, c, n, result)
+            this.#find(method, path, c, n, result)
             if (result[0] !== undefined) {
                 return result
             }
@@ -319,7 +364,7 @@ class Router<T = any> {
             preSearch = path
             path = path.substring(i)
 
-            this.find(method, path, c, n, result)
+            this.#find(method, path, c, n, result)
             if (result[0] !== undefined) return result
 
             n--
@@ -332,11 +377,9 @@ class Router<T = any> {
         if (c !== undefined) {
             pvalues[n] = path
             path = '' // End search
-            this.find(method, path, c, n, result)
+            this.#find(method, path, c, n, result)
         }
 
         return result
     }
 }
-
-export default Router

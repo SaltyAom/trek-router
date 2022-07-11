@@ -1,61 +1,64 @@
 {
-  "name": "trek-router",
-  "version": "1.2.0",
-  "description": "A fast HTTP router",
-  "repository": "trekjs/router",
-  "author": {
-    "name": "Fangdun Cai",
-    "email": "cfddream@gmail.com",
-    "url": "fundon.me"
-  },
-  "license": "MIT",
-  "keywords": [
-    "route",
-    "router",
-    "routing",
-    "trek",
-    "trek-router"
-  ],
-  "main": "index.js",
-  "scripts": {
-    "bench": "node benchmarks",
-    "test": "mocha --compilers js:babel-core/register --reporter spec --bail --check-leaks test/**/*.test.js",
-    "test-ci": "babel-node node_modules/.bin/isparta cover node_modules/.bin/_mocha --report lcovonly --  --reporter spec --check-leaks test/**/*.test.js",
-    "test-cov": "babel-node node_modules/.bin/isparta cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks test/**/*.test.js"
-  },
-  "devDependencies": {
-    "babel-cli": "6.26.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "6.26.0",
-    "babel-plugin-transform-export-extensions": "6",
-    "babel-preset-es2016": "6.24.1",
-    "benchmark": "2.1.4",
-    "finalhandler": "1.1.0",
-    "isparta": "4",
-    "lodash": "4",
-    "mocha": "4.0.1",
-    "path-to-regexp": "2.0.0",
-    "power-assert": "1.4.4",
-    "route-recognizer": "0.3.3",
-    "route-trie": "2.2.2",
-    "routington": "1",
-    "supertest": "3",
-    "wayfarer": "6.6.2"
-  },
-  "engines": {
-    "node": ">= 6"
-  },
-  "files": [
-    "HISTORY.md",
-    "LICENSE",
-    "index.js"
-  ],
-  "babel": {
-    "plugins": [
-      "transform-es2015-modules-commonjs",
-      "transform-export-extensions"
+    "name": "@saltyaom/trek-router",
+    "description": "Smol HTTP router library",
+    "version": "0.0.0",
+    "author": {
+        "name": "saltyAom",
+        "url": "https://github.com/SaltyAom",
+        "email": "saltyaom@gmail.com"
+    },
+    "main": "build/index.js",
+    "module": "build/es/index.js",
+    "esnext": "build/es/index.js",
+    "types": "src/index.ts",
+    "typings": "src/index.ts",
+    "keywords": [
+        "smol",
+        "http",
+        "router"
     ],
-    "presets": [
-      "es2016"
-    ]
-  }
+    "homepage": "https://github.com/saltyaom/string-theocracy",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/saltyaom/string-theocracy"
+    },
+    "bugs": "https://github.com/SaltyAom/string-theocracy/issues",
+    "license": "MIT",
+    "scripts": {
+        "dev": "nodemon --config nodemon.json",
+        "bench": "node benchmarks",
+        "test": "mocha --compilers js:babel-core/register --reporter spec --bail --check-leaks test/**/*.test.js",
+        "test-ci": "babel-node node_modules/.bin/isparta cover node_modules/.bin/_mocha --report lcovonly --  --reporter spec --check-leaks test/**/*.test.js",
+        "test-cov": "babel-node node_modules/.bin/isparta cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks test/**/*.test.js",
+        "build": "npm run build:main && npm run build:cjs && npm run build:es",
+        "build:cjs": "swc src --config-file .cjs.swcrc -d build/cjs",
+        "build:es": "swc src --config-file .es.swcrc -d build/es",
+        "build:main": "swc src --config-file .cjs.swcrc -d build"
+    },
+    "devDependencies": {
+        "@swc/cli": "^0.1.57",
+        "@swc/core": "^1.2.211",
+        "@swc/jest": "^0.2.21",
+        "@types/jest": "^28.1.4",
+        "@types/node": "^18.0.3",
+        "nodemon": "^2.0.19",
+        "typescript": "^4.7.4"
+    },
+    "engines": {
+        "node": ">= 14"
+    },
+    "files": [
+        "HISTORY.md",
+        "LICENSE",
+        "index.js"
+    ],
+    "babel": {
+        "plugins": [
+            "transform-es2015-modules-commonjs",
+            "transform-export-extensions"
+        ],
+        "presets": [
+            "es2016"
+        ]
+    }
 }

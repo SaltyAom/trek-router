@@ -1,5 +1,8 @@
-# trek-router
+# @saltyaom/trek-router
 
+Fork of Trek Router with some additional feature, and TypeScript support.
+
+## Trek Router
 A fast HTTP router, inspired by [Echo](https://github.com/labstack/echo)'s Router.
 
 
