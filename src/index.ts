@@ -144,11 +144,11 @@ class TrekNode<T = any> {
 }
 
 export default class Router<T = any> {
-    #tree: TrekNode<T>
+    _tree: TrekNode<T>
     routes: any[]
 
     constructor() {
-        this.#tree = new TrekNode()
+        this._tree = new TrekNode()
         this.routes = []
     }
 
@@ -163,7 +163,7 @@ export default class Router<T = any> {
             if (ch === COLON) {
                 j = i + 1
 
-                this.#insert(method, path.substring(0, i), SKIND)
+                this._insert(method, path.substring(0, i), SKIND)
                 while (i < l && path.charCodeAt(i) !== SLASH) {
                     i++
                 }
@@ -174,7 +174,7 @@ export default class Router<T = any> {
                 l = path.length
 
                 if (i === l) {
-                    this.#insert(
+                    this._insert(
                         method,
                         path.substring(0, i),
                         PKIND,
@@ -183,11 +183,11 @@ export default class Router<T = any> {
                     )
                     return
                 }
-                this.#insert(method, path.substring(0, i), PKIND, pnames)
+                this._insert(method, path.substring(0, i), PKIND, pnames)
             } else if (ch === STAR) {
-                this.#insert(method, path.substring(0, i), SKIND)
+                this._insert(method, path.substring(0, i), SKIND)
                 pnames.push('*')
-                this.#insert(
+                this._insert(
                     method,
                     path.substring(0, l),
                     AKIND,
@@ -197,10 +197,10 @@ export default class Router<T = any> {
                 return
             }
         }
-        this.#insert(method, path, SKIND, pnames, handler)
+        this._insert(method, path, SKIND, pnames, handler)
     }
 
-    #insert(
+    _insert(
         method: string,
         path: string,
         t: number,
@@ -208,7 +208,7 @@ export default class Router<T = any> {
         handler?: any
     ) {
         // Copy current TrekNode as root
-        let [cn] = [this.#tree]
+        let [cn] = [this._tree]
         let prefix, sl, pl, l, max, n, c
 
         while (true) {
@@ -282,7 +282,7 @@ export default class Router<T = any> {
     find(method: HTTPMethod, url: string): Result<T> {
         const [path, query] = splitQuery(removeHostnamePath(url))
 
-        let result = this.#find(method, path, undefined, 0, [
+        let result = this._find(method, path, undefined, 0, [
             undefined,
             []
         ] as any)
@@ -294,14 +294,14 @@ export default class Router<T = any> {
         return result
     }
 
-    #find(
+    _find(
         method: HTTPMethod,
         path: string,
         cn: TrekNode | undefined,
         n: number,
         result: Result<T>
     ) {
-        cn = cn || this.#tree // Current TrekNode as root
+        cn = cn || this._tree // Current TrekNode as root
         const sl = path.length
         const prefix = cn.prefix
         const pvalues = result[1] as any[] // Params
@@ -337,7 +337,7 @@ export default class Router<T = any> {
         // Static TrekNode
         c = cn.findChild(path.charCodeAt(0), SKIND)
         if (c !== undefined) {
-            this.#find(method, path, c, n, result)
+            this._find(method, path, c, n, result)
             if (result[0] !== undefined) {
                 return result
             }
@@ -364,7 +364,7 @@ export default class Router<T = any> {
             preSearch = path
             path = path.substring(i)
 
-            this.#find(method, path, c, n, result)
+            this._find(method, path, c, n, result)
             if (result[0] !== undefined) return result
 
             n--
@@ -377,7 +377,7 @@ export default class Router<T = any> {
         if (c !== undefined) {
             pvalues[n] = path
             path = '' // End search
-            this.#find(method, path, c, n, result)
+            this._find(method, path, c, n, result)
         }
 
         return result
