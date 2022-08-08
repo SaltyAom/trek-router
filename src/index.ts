@@ -4,9 +4,7 @@
  * MIT Licensed
  */
 
-'use strict'
-
-import { parse as parseQueryString, type ParsedUrlQuery } from 'querystring'
+import { parseQuery, parseUrl } from './libs'
 
 // Static Param Any `*` `/` `:`
 const [SKIND, PKIND, AKIND, STAR, SLASH, COLON] = [0, 1, 2, 42, 47, 58]
@@ -14,7 +12,7 @@ const [SKIND, PKIND, AKIND, STAR, SLASH, COLON] = [0, 1, 2, 42, 47, 58]
 type Result<T = any> = [
     handler: undefined | T,
     params: [string, string][],
-    query: ParsedUrlQuery
+    query: Record<string, string>
 ]
 
 export type HTTPMethod =
@@ -52,30 +50,6 @@ export type HTTPMethod =
     | 'UNLINK'
     | 'UNLOCK'
     | 'UNSUBSCRIBE'
-
-export const removeHostnamePath = (path: string) => {
-    if (path.charCodeAt(0) === 47) return path
-
-    const total = path.length
-
-    let i = 1
-    let point = 0
-
-    for (; i < total; i++)
-        if (path.charCodeAt(i) === 47)
-            if (point < 2) point++
-            else break
-
-    return path.slice(i)
-}
-
-const splitQuery = (s: string) => {
-    const i = s.indexOf('?')
-
-    if (i === -1) return [s, '']
-
-    return [s.slice(0, i), s.slice(i + 1)]
-}
 
 class TrekNode<T = any> {
     label: number
@@ -164,25 +138,22 @@ export default class Router<T = any> {
                 j = i + 1
 
                 this._insert(method, path.substring(0, i), SKIND)
-                while (i < l && path.charCodeAt(i) !== SLASH) {
-                    i++
-                }
+                while (i < l && path.charCodeAt(i) !== SLASH) i++
 
                 pnames.push(path.substring(j, i))
                 path = path.substring(0, j) + path.substring(i)
                 i = j
                 l = path.length
 
-                if (i === l) {
-                    this._insert(
+                if (i === l)
+                    return void this._insert(
                         method,
                         path.substring(0, i),
                         PKIND,
                         pnames,
                         handler
                     )
-                    return
-                }
+
                 this._insert(method, path.substring(0, i), PKIND, pnames)
             } else if (ch === STAR) {
                 this._insert(method, path.substring(0, i), SKIND)
@@ -280,16 +251,15 @@ export default class Router<T = any> {
     }
 
     find(method: HTTPMethod, url: string): Result<T> {
-        const [path, query] = splitQuery(removeHostnamePath(url))
+        const [path, stringifiedQuery] = parseUrl(url)
 
         let result = this._find(method, path, undefined, 0, [
             undefined,
             []
         ] as any)
 
-        if (query)
-            // @ts-ignore
-            result[2] = parseQueryString(query)
+        // @ts-ignore
+        result[2] = stringifiedQuery ? parseQuery(stringifiedQuery) : {}
 
         return result
     }

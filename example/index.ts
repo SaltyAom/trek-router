@@ -9,7 +9,7 @@ router.add('GET', '/id/:id', 'named')
 
 console.log(router.find('GET', '/'))
 console.log(router.find('GET', '/id/1'))
-console.log(router.find('GET', 'http://localhost/id/1'))
+console.log(router.find('GET', 'http://localhost:8080/id/1'))
 // console.log(router.find('GET', '/ida'))
 
 // console.dir(router.routes, {

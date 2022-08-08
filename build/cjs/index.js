@@ -1,39 +1,17 @@
-'use strict';
-!function(a, b) {
-    for(var c in b)Object.defineProperty(a, c, {
-        enumerable: !0,
-        get: b[c]
-    });
-}(exports, {
-    default: ()=>k,
-    removeHostnamePath: ()=>h
+"use strict";
+Object.defineProperty(exports, "default", {
+    enumerable: !0,
+    get: ()=>i
 });
-const a = require("querystring"), [b, c, d, e, f, g] = [
+const a = require("./libs"), [b, c, d, e, f, g] = [
     0,
     1,
     2,
     42,
     47,
     58
-], h = (a)=>{
-    if (47 === a.charCodeAt(0)) return a;
-    let b = a.length, c = 1, d = 0;
-    for(; c < b; c++)if (47 === a.charCodeAt(c)) {
-        if (d < 2) d++;
-        else break;
-    }
-    return a.slice(c);
-}, i = (a)=>{
-    let b = a.indexOf('?');
-    return -1 === b ? [
-        a,
-        ''
-    ] : [
-        a.slice(0, b),
-        a.slice(b + 1)
-    ];
-};
-class j {
+];
+class h {
     constructor(a = '/', c = [], d = b, e = Object.create(null)){
         this.label = a.charCodeAt(0), this.prefix = a, this.children = c, this.kind = d, this.map = e;
     }
@@ -59,10 +37,9 @@ class j {
         return this.map[a];
     }
 }
-class k {
-    #a;
+class i {
     constructor(){
-        this.#a = new j(), this.routes = [];
+        this._tree = new h(), this.routes = [];
     }
     add(a, h, i) {
         let [j, k, l] = [
@@ -75,70 +52,67 @@ class k {
             h,
             i
         ]); j < k; ++j)if ((m = h.charCodeAt(j)) === g) {
-            for(n = j + 1, this.#b(a, h.substring(0, j), b); j < k && h.charCodeAt(j) !== f;)j++;
-            if (l.push(h.substring(n, j)), h = h.substring(0, n) + h.substring(j), j = n, k = h.length, j === k) {
-                this.#b(a, h.substring(0, j), c, l, i);
-                return;
-            }
-            this.#b(a, h.substring(0, j), c, l);
+            for(n = j + 1, this._insert(a, h.substring(0, j), b); j < k && h.charCodeAt(j) !== f;)j++;
+            if (l.push(h.substring(n, j)), h = h.substring(0, n) + h.substring(j), j = n, k = h.length, j === k) return void this._insert(a, h.substring(0, j), c, l, i);
+            this._insert(a, h.substring(0, j), c, l);
         } else if (m === e) {
-            this.#b(a, h.substring(0, j), b), l.push('*'), this.#b(a, h.substring(0, k), d, l, i);
+            this._insert(a, h.substring(0, j), b), l.push('*'), this._insert(a, h.substring(0, k), d, l, i);
             return;
         }
-        this.#b(a, h, b, l, i);
+        this._insert(a, h, b, l, i);
     }
-     #b(l, m, n, o, p) {
-        let [q] = [
-            this.#a
-        ], r, s, t, u, v, w, x;
+    _insert(a, c, d, e, f) {
+        let [g] = [
+            this._tree
+        ], i, j, k, l, m, n, o;
         for(;;){
-            for(r = q.prefix, s = m.length, t = r.length, u = 0, v = s < t ? s : t; u < v && m.charCodeAt(u) === r.charCodeAt(u);)u++;
-            if (u < t) w = new j(r.substring(u), q.children, q.kind, q.map), q.children = [
-                w
-            ], q.label = r.charCodeAt(0), q.prefix = r.substring(0, u), q.map = Object.create(null), q.kind = b, u === s ? (q.addHandler(l, p, o), q.kind = n) : ((w = new j(m.substring(u), [], n)).addHandler(l, p, o), q.addChild(w));
-            else if (u < s) {
-                if (m = m.substring(u), void 0 !== (x = q.findChildWithLabel(m.charCodeAt(0)))) {
-                    q = x;
+            for(i = g.prefix, j = c.length, k = i.length, l = 0, m = j < k ? j : k; l < m && c.charCodeAt(l) === i.charCodeAt(l);)l++;
+            if (l < k) n = new h(i.substring(l), g.children, g.kind, g.map), g.children = [
+                n
+            ], g.label = i.charCodeAt(0), g.prefix = i.substring(0, l), g.map = Object.create(null), g.kind = b, l === j ? (g.addHandler(a, f, e), g.kind = d) : ((n = new h(c.substring(l), [], d)).addHandler(a, f, e), g.addChild(n));
+            else if (l < j) {
+                if (c = c.substring(l), void 0 !== (o = g.findChildWithLabel(c.charCodeAt(0)))) {
+                    g = o;
                     continue;
                 }
-                (w = new j(m, [], n)).addHandler(l, p, o), q.addChild(w);
-            } else void 0 !== p && q.addHandler(l, p, o);
+                (n = new h(c, [], d)).addHandler(a, f, e), g.addChild(n);
+            } else void 0 !== f && g.addHandler(a, f, e);
             return;
         }
     }
     find(b, c) {
-        let [d, e] = i(h(c)), f = this.#c(b, d, void 0, 0, [
+        let [d, e] = (0, a.parseUrl)(c), f = this._find(b, d, void 0, 0, [
             void 0,
             []
         ]);
-        return e && (f[2] = (0, a.parse)(e)), f;
+        return f[2] = e ? (0, a.parseQuery)(e) : {}, f;
     }
-     #c(y, z, A, B, C) {
-        A = A || this.#a;
-        let D = z.length, E = A.prefix, F = C[1], G, H, I, J, K, L;
-        if (0 === D || z === E) {
-            let M = A.findHandler(y);
-            if (void 0 !== (C[0] = M && M.handler)) {
-                let N = M.pnames;
-                if (void 0 !== N) for(G = 0, I = N.length; G < I; ++G)F[G] = [
-                    N[G],
-                    F[G]
+    _find(a, e, g, h, i) {
+        g = g || this._tree;
+        let j = e.length, k = g.prefix, l = i[1], m, n, o, p, q, r;
+        if (0 === j || e === k) {
+            let s = g.findHandler(a);
+            if (void 0 !== (i[0] = s && s.handler)) {
+                let t = s.pnames;
+                if (void 0 !== t) for(m = 0, o = t.length; m < o; ++m)l[m] = [
+                    t[m],
+                    l[m]
                 ];
             }
-            return C;
+            return i;
         }
-        for(H = E.length, I = 0, J = D < H ? D : H; I < J && z.charCodeAt(I) === E.charCodeAt(I);)I++;
-        if (I === H && (z = z.substring(I)), L = z, void 0 !== (K = A.findChild(z.charCodeAt(0), b))) {
-            if (this.#c(y, z, K, B, C), void 0 !== C[0]) return C;
-            z = L;
+        for(n = k.length, o = 0, p = j < n ? j : n; o < p && e.charCodeAt(o) === k.charCodeAt(o);)o++;
+        if (o === n && (e = e.substring(o)), r = e, void 0 !== (q = g.findChild(e.charCodeAt(0), b))) {
+            if (this._find(a, e, q, h, i), void 0 !== i[0]) return i;
+            e = r;
         }
-        if (I !== H) return C;
-        if (void 0 !== (K = A.findChildByKind(c))) {
-            for(I = z.length, G = 0; G < I && z.charCodeAt(G) !== f;)G++;
-            if (F[B] = z.substring(0, G), B++, L = z, z = z.substring(G), this.#c(y, z, K, B, C), void 0 !== C[0]) return C;
-            B--, F.pop(), z = L;
+        if (o !== n) return i;
+        if (void 0 !== (q = g.findChildByKind(c))) {
+            for(o = e.length, m = 0; m < o && e.charCodeAt(m) !== f;)m++;
+            if (l[h] = e.substring(0, m), h++, r = e, e = e.substring(m), this._find(a, e, q, h, i), void 0 !== i[0]) return i;
+            h--, l.pop(), e = r;
         }
-        return void 0 !== (K = A.findChildByKind(d)) && (F[B] = z, z = '', this.#c(y, z, K, B, C)), C;
+        return void 0 !== (q = g.findChildByKind(d)) && (l[h] = e, e = '', this._find(a, e, q, h, i)), i;
     }
 }
 
