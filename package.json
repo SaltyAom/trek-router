@@ -1,7 +1,7 @@
 {
     "name": "@saltyaom/trek-router",
     "description": "Smol HTTP router library",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": {
         "name": "saltyAom",
         "url": "https://github.com/SaltyAom",

@@ -4,7 +4,22 @@
  * MIT Licensed
  */
 
-import { parseQuery, parseUrl } from './libs'
+const hostRegex = /^\w+:\/\/.*?\//g
+const paramsRegex = /([^?=&]+)(=([^&]*))?/g
+
+const parseUrl = (url: string) => {
+    if (url.charCodeAt(0) !== SLASH) url = url.replace(hostRegex, '/')
+
+    return url.replace(hostRegex, '/').split('?')
+}
+
+const parseQuery = (search: string) =>
+    (search.match(paramsRegex) || []).reduce((result, each) => {
+        const [key, value] = each.split('=')
+        result[key] = value
+
+        return result
+    }, {} as Record<string, string>)
 
 // Static Param Any `*` `/` `:`
 const [SKIND, PKIND, AKIND, STAR, SLASH, COLON] = [0, 1, 2, 42, 47, 58]
