@@ -1,25 +1,45 @@
 /*!
- * router
- * Copyright(c) 2015-2017 Fangdun Cai
+ * SaltyAom's Trek Router router fork
+ * Copyright(c) 2022 SaltyAom
  * MIT Licensed
  */
 
-const hostRegex = /^\w+:\/\/.*?\//g
-const paramsRegex = /([^?=&]+)(=([^&]*))?/g
+const paramsRegex = /([^?=&]+)(=([^&]*))?/
 
-const parseUrl = (url: string) => {
-    if (url.charCodeAt(0) !== SLASH) url = url.replace(hostRegex, '/')
+const splitQuery = (s: string) => {
+    const i = s.indexOf('?')
 
-    return url.replace(hostRegex, '/').split('?')
+    return i === -1 ? [s, ''] : [s.slice(0, i), s.slice(i + 1)]
+}
+
+export const removeHostnamePath = (path: string) => {
+    if (path.charCodeAt(0) === 47) return path
+
+    const total = path.length
+
+    // Worst case: http://a.aa/
+    let i = 12
+
+    for (; i < total; i++)
+        if (path.charCodeAt(i) === 47)
+            break
+
+    return path.slice(i)
 }
 
 const parseQuery = (search: string) =>
-    (search.match(paramsRegex) || []).reduce((result, each) => {
+    search.split("&").reduce((result, each) => {
         const [key, value] = each.split('=')
         result[key] = value
 
         return result
     }, {} as Record<string, string>)
+
+/*!
+ * router
+ * Copyright(c) 2015-2017 Fangdun Cai
+ * MIT Licensed
+ */
 
 // Static Param Any `*` `/` `:`
 const [SKIND, PKIND, AKIND, STAR, SLASH, COLON] = [0, 1, 2, 42, 47, 58]
@@ -173,14 +193,13 @@ export default class Router<T = any> {
             } else if (ch === STAR) {
                 this._insert(method, path.substring(0, i), SKIND)
                 pnames.push('*')
-                this._insert(
+                return void this._insert(
                     method,
                     path.substring(0, l),
                     AKIND,
                     pnames,
                     handler
                 )
-                return
             }
         }
         this._insert(method, path, SKIND, pnames, handler)
@@ -266,7 +285,7 @@ export default class Router<T = any> {
     }
 
     find(method: HTTPMethod, url: string): Result<T> {
-        const [path, stringifiedQuery] = parseUrl(url)
+        const [path, stringifiedQuery] = splitQuery(removeHostnamePath(url))
 
         let result = this._find(method, path, undefined, 0, [
             undefined,
