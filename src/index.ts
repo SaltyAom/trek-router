@@ -4,8 +4,6 @@
  * MIT Licensed
  */
 
-const paramsRegex = /([^?=&]+)(=([^&]*))?/
-
 const splitQuery = (s: string) => {
     const i = s.indexOf('?')
 
