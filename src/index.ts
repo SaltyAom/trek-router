@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-const splitQuery = (s: string) => {
-    const i = s.indexOf('?')
+const splitOnce = (char: string, s: string) => {
+    const i = s.indexOf(char)
 
     return i === -1 ? [s, ''] : [s.slice(0, i), s.slice(i + 1)]
 }
@@ -25,9 +25,9 @@ export const removeHostnamePath = (path: string) => {
     return path.slice(i)
 }
 
-const parseQuery = (search: string) =>
+const parseQuery = (search: string) => 
     search.split("&").reduce((result, each) => {
-        const [key, value] = each.split('=')
+        const [key, value] = splitOnce('=', each)
         result[key] = value
 
         return result
@@ -283,7 +283,7 @@ export default class Router<T = any> {
     }
 
     find(method: HTTPMethod, url: string): Result<T> {
-        const [path, stringifiedQuery] = splitQuery(removeHostnamePath(url))
+        const [path, stringifiedQuery] = splitOnce("?", removeHostnamePath(url))
 
         let result = this._find(method, path, undefined, 0, [
             undefined,
